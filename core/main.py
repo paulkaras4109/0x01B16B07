@@ -10,11 +10,6 @@ import sys
 import time
 import random
 
-import numpy
-import sympy
-import scipy
-
-
 bot = commands.Bot(command_prefix = "$", description=constants.description)
 
 @bot.event
