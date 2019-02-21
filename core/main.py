@@ -105,4 +105,4 @@ async def pic(ctx):
 
 
 token = os.environ.get("BOT_TOKEN")
-bot.run('token')
+bot.run(token)
