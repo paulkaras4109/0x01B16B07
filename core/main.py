@@ -4,13 +4,17 @@ from discord.utils import get
 import constants
 import os
 import asyncio
-
 import sys
 
 import time
 import random
+import urllib
+from urllib import request
+from bs4 import BeautifulSoup
 
 bot = commands.Bot(command_prefix = "$", description=constants.description)
+cli = discord.Client()
+cli.login('NTQ4MDMyNzMyMDAxNzMwNTYx.D0_bOQ.5Pc_NtdFC0ox0Whn3v8embti_ac')
 
 @bot.event
 async def on_ready():
@@ -44,7 +48,7 @@ async def joined(member : discord.Member):
 @bot.command(pass_context=True)
 async def pasta(ctx):
     '''
-    Prints a specified pasta or a random one.
+    Prints a specified or random copypasta.
     Usage: $pasta 'key'
     Avalibe keys: enter 'list' as the key
     If key is not specified, a random one is chosen.
@@ -67,6 +71,38 @@ async def pasta(ctx):
     
     await bot.say(pasta)
 
+@bot.command(pass_context=True)
+async def pic(ctx):
+    args = ctx.message.content.split(" ")
+
+    validpaths = ["google", "anime", "comfy", "homework"]
+
+    path = ""
+    if len(args) == 2:
+        if args[1] in validpaths:
+            path = "/" + args[1] + "/"
+        else:
+            path = "/" + random.choice(validpaths) + "/"
+    else:
+        path = "/" + random.choice(validpaths) + "/"
+    
+    pic = random.choice([
+        x for x in os.listdir(path)
+        if os.path.isfile(os.path.join(path, x))
+    ])
+    ext = os.path.splitext(pic)[1]
+    while True:
+        pic = random.choice([
+            x for x in os.listdir(path)
+            if os.path.isfile(os.path.join(path, x))
+        ])
+        ext = os.path.splitext(pic)[1]
+        if (ext == '.png') or (ext == '.jpg') or (ext == '.gif') or (ext == '.webm'):
+            break
+    
+    f = path + pic
+    await bot.send_file(ctx.message.channel, f)
+
 
 token = os.environ.get("BOT_TOKEN")
-bot.run(token)
+bot.run('token')
