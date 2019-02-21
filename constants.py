@@ -1,1 +1,0 @@
-commands = ["$Hello - prints out \"world\"", "$help - this command"]

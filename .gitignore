@@ -1,2 +1,4 @@
 /bin/
 security.py
+.gitignore
+/__pycache__/
