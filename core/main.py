@@ -109,14 +109,8 @@ async def pic(ctx):
             break
     
     f = path + pic
-    await ctx.send_file(ctx.message.channel, f)
-
-@bot.command()
-async def checknsfw(ctx):
-    if (ctx.channel.is_nsfw()):
-        await ctx.send("This is an NSFW channel")
-    else:
-        await ctx.send("This isn't an NSFW channel")
+    img = discord.File(f)
+    await ctx.send(file=img)
 
 
 token = os.environ.get("BOT_TOKEN")
