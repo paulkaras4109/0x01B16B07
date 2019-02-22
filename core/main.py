@@ -13,39 +13,38 @@ from urllib import request
 from bs4 import BeautifulSoup
 
 bot = commands.Bot(command_prefix = "$", description=constants.description)
-cli = discord.Client()
-cli.login('NTQ4MDMyNzMyMDAxNzMwNTYx.D0_bOQ.5Pc_NtdFC0ox0Whn3v8embti_ac')
 
 @bot.event
 async def on_ready():
     print("init successful")
-    await bot.change_presence(game=discord.Game(name="existing - $help"))
+    await bot.change_presence(activity=discord.Game(name='existence - $help', type=2))
 
 @bot.command()
-async def hello():
+async def hello(ctx):
     '''
     Says "World"
     Usage: $world
     '''
-    await bot.say("World")
+    await ctx.send("World")
 
-@bot.command(pass_context=True)
+@bot.command()
 async def checkme(ctx):
     '''
     Checks your message
-    Usage: $checkme
+    Usage: $checkme3
     '''
-    checked = get(bot.get_all_emojis(), name = 'checked')
-    await bot.add_reaction(ctx.message, checked)
+    checked = bot.get_emoji(408868557078921216)
+
+    await ctx.message.add_reaction(checked)
 
 @bot.command()
-async def joined(member : discord.Member):
+async def joined(ctx, member : discord.Member):
     '''
     Says when a member joined the server.
     '''
-    await bot.say('{0.name} joined in {0.joined_at}'.format(member))
+    await ctx.send('{0.name} joined in {0.joined_at}'.format(member))
 
-@bot.command(pass_context=True)
+@bot.command()
 async def pasta(ctx):
     '''
     Prints a specified or random copypasta.
@@ -69,9 +68,9 @@ async def pasta(ctx):
     if ps == "list":
         pasta = keys
     
-    await bot.say(pasta)
+    await ctx.send(pasta)
 
-@bot.command(pass_context=True)
+@bot.command()
 async def pic(ctx):
     '''
     Outputs an image into the channel
@@ -95,7 +94,7 @@ async def pic(ctx):
         path = "/" + random.choice(validpaths) + "/"
     
     if (path == "/homework/") and (ctx.message.channel.is_nsfw() == False):
-        bot.say("Calling NSFW command in non-NSFW channel. This incident will be reported.")
+        await ctx.send("Calling NSFW command in non-NSFW channel. This incident will be reported.")
         return
     
     pic = random.choice([
@@ -113,7 +112,14 @@ async def pic(ctx):
             break
     
     f = path + pic
-    await bot.send_file(ctx.message.channel, f)
+    await ctx.send_file(ctx.message.channel, f)
+
+@bot.command()
+async def checknsfw(ctx):
+    if (ctx.channel.is_nsfw()):
+        await ctx.send("This is an NSFW channel")
+    else:
+        await ctx.send("This isn't an NSFW channel")
 
 
 token = os.environ.get("BOT_TOKEN")
