@@ -73,6 +73,14 @@ async def pasta(ctx):
 
 @bot.command(pass_context=True)
 async def pic(ctx):
+    '''
+    Outputs an image into the channel
+    Usage: $pic 'source'
+    Avalibe Sources: google, anime, comfy, homework
+    If a key is not specified, a random one is chosen.
+    'homework' is an NSFW key and can only be used in NSFW channels.
+    '''
+    
     args = ctx.message.content.split(" ")
 
     validpaths = ["google", "anime", "comfy", "homework"]
@@ -85,6 +93,10 @@ async def pic(ctx):
             path = "/" + random.choice(validpaths) + "/"
     else:
         path = "/" + random.choice(validpaths) + "/"
+    
+    if (path == "/homework/") and (ctx.message.channel.is_nsfw() == False):
+        bot.say("Calling NSFW command in non-NSFW channel. This incident will be reported.")
+        return
     
     pic = random.choice([
         x for x in os.listdir(path)
