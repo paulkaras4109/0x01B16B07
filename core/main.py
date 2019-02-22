@@ -8,9 +8,6 @@ import sys
 
 import time
 import random
-import urllib
-from urllib import request
-from bs4 import BeautifulSoup
 
 bot = commands.Bot(command_prefix = "$", description=constants.description)
 
