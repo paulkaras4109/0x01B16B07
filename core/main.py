@@ -127,5 +127,32 @@ async def pic(ctx):
     await ctx.send(file=img)
 
 
+@bot.command()
+async def selfie(ctx):
+    '''
+    Posts a selfie of the bot.
+    '''
+    
+    path = "/selfies/"
+    
+    pic = random.choice([
+        x for x in os.listdir(path)
+        if os.path.isfile(os.path.join(path, x))
+    ])
+    ext = os.path.splitext(pic)[1]
+    while True:
+        pic = random.choice([
+            x for x in os.listdir(path)
+            if os.path.isfile(os.path.join(path, x))
+        ])
+        ext = os.path.splitext(pic)[1]
+        if (ext == '.png') or (ext == '.jpg') or (ext == '.gif') or (ext == '.webm'):
+            break
+    
+    f = path + pic
+    img = discord.File(f)
+    await ctx.send(file=img)
+    
+
 token = os.environ.get("BOT_TOKEN")
 bot.run(token)
