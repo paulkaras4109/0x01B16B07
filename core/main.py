@@ -91,8 +91,8 @@ async def pic(ctx):
     
     args = ctx.message.content.split(" ")
 
-    validpaths = ["google", "anime", "comfy", "homework"]
-    #We don't want to choose homework as a random valid path
+    validpaths = ["google", "anime", "comfy", "homework", "art"]
+    #We don't want to choose NSFW content as a random valid path
     vp_skinny = ["google", "anime", "comfy"]
 
     path = ""
@@ -104,7 +104,7 @@ async def pic(ctx):
     else:
         path = "/" + random.choice(vp_skinny) + "/"
     
-    if (path == "/homework/") and (ctx.message.channel.is_nsfw() == False):
+    if (path == "/homework/" or path == "/art/") and (ctx.message.channel.is_nsfw() == False):
         await ctx.send("Calling NSFW command in non-NSFW channel. This incident will be reported.")
         return
     
