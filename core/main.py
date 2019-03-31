@@ -42,9 +42,22 @@ async def joined(ctx, member : discord.Member):
     Says when a member joined the server.
     '''
     await ctx.send('{0.name} joined in {0.joined_at}'.format(member))
+    
+@bot.command()
+async def roll(ctx, dice: str):
+    """Rolls a dice in NdN format."""
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await ctx.send('Format has to be in NdN!')
+        return
+
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await ctx.send(result)
 
 @bot.command()
 async def pasta(ctx):
+
     '''
     Prints a specified or random copypasta.
     Usage: $pasta 'key'
@@ -81,18 +94,20 @@ async def pic(ctx):
     
     args = ctx.message.content.split(" ")
 
-    validpaths = ["google", "anime", "comfy", "homework"]
+    validpaths = ["google", "anime", "comfy", "homework", "art"]
+    #We don't want to choose NSFW content as a random valid path
+    vp_skinny = ["google", "anime", "comfy"]
 
     path = ""
     if len(args) == 2:
         if args[1] in validpaths:
             path = "/" + args[1] + "/"
         else:
-            path = "/" + random.choice(validpaths) + "/"
+            path = "/" + random.choice(vp_skinny) + "/"
     else:
-        path = "/" + random.choice(validpaths) + "/"
+        path = "/" + random.choice(vp_skinny) + "/"
     
-    if (path == "/homework/") and (ctx.message.channel.is_nsfw() == False):
+    if (path == "/homework/" or path == "/art/") and (ctx.message.channel.is_nsfw() == False):
         await ctx.send("Calling NSFW command in non-NSFW channel. This incident will be reported.")
         return
     
@@ -150,9 +165,32 @@ async def mcserverstatus(ctx):
     except:
         await ctx.send("Error: could not contact MC server, or server does not support queries")
 
+@bot.command()
+async def selfie(ctx):
+    '''
+    Posts a selfie of the bot.
+    '''
+    
+    path = "/selfies/"
+    
+    pic = random.choice([
+        x for x in os.listdir(path)
+        if os.path.isfile(os.path.join(path, x))
+    ])
+    ext = os.path.splitext(pic)[1]
+    while True:
+        pic = random.choice([
+            x for x in os.listdir(path)
+            if os.path.isfile(os.path.join(path, x))
+        ])
+        ext = os.path.splitext(pic)[1]
+        if (ext == '.png') or (ext == '.jpg') or (ext == '.gif') or (ext == '.webm'):
+            break
+    
+    f = path + pic
+    img = discord.File(f)
+    await ctx.send(file=img)
+    
 
-
-
-#token = os.environ.get("BOT_TOKEN")
-token = "NTQ4MDMyNzMyMDAxNzMwNTYx.XKA5EQ.e7W73xrMVVUcEKrORMb7QHN3I4k"
+token = os.environ.get("BOT_TOKEN")
 bot.run(token)
