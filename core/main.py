@@ -9,6 +9,8 @@ import sys
 import time
 import random
 
+from mcstatus import MinecraftServer
+
 bot = commands.Bot(command_prefix = "$", description=constants.description)
 
 @bot.event
@@ -112,6 +114,45 @@ async def pic(ctx):
     img = discord.File(f)
     await ctx.send(file=img)
 
+@bot.command()
+async def mcserverstatus(ctx):
+    '''
+    Gets the status of a Minecraft server
+    Usage: $mcserverstatus 'ip'
+    ip: an IPv4 address, including port (if not default 25565).
+    If none is specified, defaults to "73.9.135.155:25565" (7h3 b1g 53rv3r)
+    '''
+    args = ctx.message.content.split(" ")
 
-token = os.environ.get("BOT_TOKEN")
+    ip = "73.9.135.155"
+
+    if len(args) == 2:
+        ip = args[1]
+    
+    try:
+        mcserver = MinecraftServer.lookup(ip)
+
+        query = mcserver.query()
+
+        desc = query.motd
+
+        soft = query.software
+        vers = soft.version
+        servertype = soft.brand
+        serverinfo = "v" + vers + " " + servertype
+
+        playerlist = "{0} players online: {1}".format(query.players.online, ", ".join(query.players.names))
+
+
+        msg = "```" + desc + "\n" + serverinfo + "\n" + playerlist + "```"
+        await ctx.send(msg)
+
+    except:
+        await ctx.send("Error: could not contact MC server, or server does not support queries")
+
+
+
+
+#token = os.environ.get("BOT_TOKEN")
+token = "NTQ4MDMyNzMyMDAxNzMwNTYx.XKA5EQ.e7W73xrMVVUcEKrORMb7QHN3I4k"
 bot.run(token)

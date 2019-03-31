@@ -1,2 +1,3 @@
 discord.py-rw
 asyncio
+mcstatus
