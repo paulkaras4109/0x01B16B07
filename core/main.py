@@ -130,10 +130,10 @@ async def pic(ctx):
     await ctx.send(file=img)
 
 @bot.command()
-async def mcserverstatus(ctx):
+async def mcss(ctx):
     '''
     Gets the status of a Minecraft server
-    Usage: $mcserverstatus 'ip'
+    Usage: $mcss 'ip'
     ip: an IPv4 address, including port (if not default 25565).
     If none is specified, defaults to "73.9.135.155:25565" (7h3 b1g 53rv3r)
     '''
@@ -147,23 +147,26 @@ async def mcserverstatus(ctx):
     try:
         mcserver = MinecraftServer.lookup(ip)
 
-        query = mcserver.query()
+        status = mcserver.status()
 
-        desc = query.motd
+        desc = status.description['text']
 
-        soft = query.software
-        vers = soft.version
-        servertype = soft.brand
-        serverinfo = "v" + vers + " " + servertype
+        vers = status.version.name
+        serverinfo = "v" + vers
 
-        playerlist = "{0} players online: {1}".format(query.players.online, ", ".join(query.players.names))
+        if status.players.sample is not None:
+            playernames = [x.name for x in status.players.sample]
+        else:
+            playernames = []
+
+        playerlist = "{0} players online: {1}".format(status.players.online, ", ".join(playernames))
 
 
         msg = "```" + desc + "\n" + serverinfo + "\n" + playerlist + "```"
         await ctx.send(msg)
 
     except:
-        await ctx.send("Error: could not contact MC server, or server does not support queries")
+        await ctx.send("Error: could not contact MC server")
 
 @bot.command()
 async def selfie(ctx):
