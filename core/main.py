@@ -46,6 +46,11 @@ async def joined(ctx, member : discord.Member):
 @bot.command()
 async def roll(ctx, dice: str):
     """Rolls a dice in NdN format."""
+    
+    args = ctx.message.content.split(" ")
+    if (len(args) < 2):
+        await ctx.send('Not enough arguments!')
+        return
     try:
         rolls, limit = map(int, dice.split('d'))
     except Exception:
