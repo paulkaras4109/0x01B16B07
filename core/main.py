@@ -140,11 +140,11 @@ async def mcss(ctx):
     Gets the status of a Minecraft server
     Usage: $mcss 'ip'
     ip: an IPv4 address, including port (if not default 25565).
-    If none is specified, defaults to "172.87.22.155:25565" (7h3 b1g 53rv3r)
+    If none is specified, defaults to "b1gb055.xyz" (7h3 b1g 53rv3r)
     '''
     args = ctx.message.content.split(" ")
 
-    ip = "172.87.22.155"
+    ip = "b1gb055.xyz"
 
     if len(args) == 2:
         ip = args[1]
