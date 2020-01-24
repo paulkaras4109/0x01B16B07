@@ -7,13 +7,6 @@ pastas = {
     #2) Think before you type. 
     #3) With great power comes great responsibility.
     ''',
-    
-    "tomboys": '''Tomboys are the ultimate straight mans choice. A regular girl has tits and pussy but comes loaded with gay shit such as make up, desire for shopping clothes and useless shit and watching boring shitty TV shows.
-A gay dude is gay but he has a partner that shares his interests.
-A tomboy has the best of both worlds, a female body but with enough /fit/ness to keep up with you, good interests and great personality.
-
-A trap is 200% gay. Not only are you fucking a dude, you are also putting up with the faggotry of a female.
-    ''',
     "todd": '''Hey, you. You're finally awake. You were trying to cross the border, right? Walked right into that Imperial ambush, same as us, and that thief over there.
 
 Damn you Stormcloaks. Skyrim was fine until you came along. Empire was nice and lazy. If they hadn't been looking for you, I could've stolen that horse and been half way to Hammerfell. 
@@ -28,24 +21,6 @@ Just as an additional side note, I also don't enjoy playing very many zombie gam
 If anybody ever wants to play, just give me a shout and I'll try and get back to ya.
 
 Wow, I really haven't updated this in quite the while now have I? Hey guys, I'm a CompE at Purdue 2021'. I play games, looking to meet new people, and otherwise nice to meet ya!
-    ''',
-    
-    "relatable": '''Yeah, it's like that moment when you're sitting on your front porch, minding your business, playing the banjo, when all of a sudden that 14-year-old blonde comes up to you and says: "Sir, would you mind?" 
-And you're like: "No, I ain't buying no fucking cookies!" and she's like: "Fine, but would you bounce me like a rubber ball?" and you just bunch her up and bounce her around a bit, shitton of fun for all concerned, 
-but then you suddenly notice she's leaking fluid and you're like: "What the fuck – really, girl?" and she's like: "Righteous, hombre!", only she says it in a Gilbert Gottfried voice and you're left wondering why that shit always happens to you
-    ''',
-    
-    "sickos": '''so many sickos
-
-I'm going to qualify this first by saying I AM A FUCKING MAN. You cannot argue with me or lie to me like you do with the women you sexually harass because
-
-I. AM. A. MAN.
-I. KNOW. WHAT. YOU'RE. DOING.
-
-So lets cut the shit, shall we? You know the truth, I know the truth. If you have an erection in public YOU'RE FUCKING DOING IT ON PURPOSE AND YOU SHOULD BE IN PRISON.
-
-There's this myth that men can't control their boners. and yet we all do! It's not that fucking hard. You can control your breathing, your bladder, you can avoid scratching an itch and yeah YOU CAN CONTROL YOUR GOD DAMN ERECTION. 
-The fact is men have just as much control over their erection as they do over their bowels. Much more, in fact. Are involuntary erections possible? yeah maybe, like how once in a while you shit your pants, but 99% of time it's sexual harassment.
     ''',
     
     "keitai": '''A boy falls in love with a girl.
@@ -72,11 +47,5 @@ While the two chase their respective loved ones, DRAMA ensues as they begin to f
 It’s a Sith legend. Darth Plagueis was a Dark Lord of the Sith, so powerful and so wise he could use the Force to influence the midichlorians to create life… He had such a knowledge of the dark side that he could even keep the ones he cared about from dying. 
 The dark side of the Force is a pathway to many abilities some consider to be unnatural. He became so powerful… the only thing he was afraid of was losing his power, which eventually, of course, he did. Unfortunately, he taught his apprentice everything he knew, then his apprentice killed him in his sleep. 
 Ironic. He could save others from death, but not himself.
-    ''',
-    
-    "navyseals": '''What the fuck did you just fucking say about me, you little bitch? I’ll have you know I graduated top of my class in the Navy Seals, and I’ve been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and I’m the top sniper in the entire US armed forces. 
-You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. 
-The storm that wipes out the pathetic little thing you call your life. You’re fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and that’s just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. 
-If only you could have known what unholy retribution your little “clever” comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn’t, you didn’t, and now you’re paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You’re fucking dead, kiddo.
     '''
 }
