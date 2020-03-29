@@ -5,6 +5,8 @@ import constants
 import os
 import asyncio
 import sys
+import youtube_dl
+import ffmpeg
 
 import time
 import random
@@ -16,15 +18,135 @@ bot = commands.Bot(command_prefix = "$", description=constants.description)
 @bot.event
 async def on_ready():
     print("init successful")
-    await bot.change_presence(activity=discord.Game(name='existence - $help', type=2))
+    await bot.change_presence(activity=discord.Activity(name='existence - $help', type=discord.ActivityType.watching))
 
-@bot.command()
-async def hello(ctx):
+async def join(ctx):
+    channel = ctx.message.author.voice.channel
+    voice = get(bot.voice_clients, guild=ctx.guild)
+
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        voice = await channel.connect()
+
+@bot.command(pass_context=True, aliases=['bye'])
+async def leave(ctx):
     '''
-    Says "World"
-    Usage: $world
+    Causes the bot to leave its current voice channel
     '''
-    await ctx.send("World")
+    voice = get(bot.voice_clients, guild=ctx.guild)
+
+    if voice and voice.is_connected():
+        await voice.disconnect()
+
+@bot.command(pass_context=True, aliases=['yt'])
+async def playyt(ctx, url: str):
+    '''
+    Plays a YouTube video in your current channel
+    Usage: $playyt url
+    url: the URL to a YouTube Video
+    '''
+    os.chdir('/Music/.tmp')
+    song_there = os.path.isfile("song.mp3")
+    try:
+        if song_there:
+            os.remove("song.mp3")
+            print("Removed old song file")
+    except PermissionError:
+        print("Trying to delete song file, but it's being played")
+        await ctx.send("ERROR: Music playing")
+        return
+
+    await join(ctx)
+    voice = get(bot.voice_clients, guild=ctx.guild)
+
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'outtmpl': '/Music/.tmp/%(title)s.%(ext)s',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        print("Downloading audio now\n")
+        ydl.download([url])
+
+    for file in os.listdir("/Music/.tmp"):
+        if file.endswith(".mp3"):
+            name = file
+            print(f"Renamed File: {file}\n")
+            os.rename(file, "song.mp3")
+
+    voice.play(discord.FFmpegPCMAudio("song.mp3"))
+    voice.source = discord.PCMVolumeTransformer(voice.source)
+    voice.source.volume = 0.07
+
+    nname = name.rsplit("-", 2)
+    await ctx.send(f"Playing: {nname[0]}")
+    print("playing\n")
+
+@bot.command(pass_context=True, aliases=['lplay'])
+async def localplay(ctx, num: int):
+    '''
+    Plays a song from the local library
+    Usage: $localplay num
+    num: int index of local song
+    '''
+    await join(ctx)
+    voice = get(bot.voice_clients, guild=ctx.guild)
+    
+    songs = [x for x in os.listdir("/Music") if x.endswith('.flac') or x.endswith('mp3')]
+    songname = songs[num]
+    songname = "/Music/" + songname 
+
+
+    voice.play(discord.FFmpegPCMAudio(songname))
+    voice.source = discord.PCMVolumeTransformer(voice.source)
+    voice.source.volume = 0.07
+
+    await ctx.send(f"Playing: {songname}")
+    print("playing\n")
+
+@bot.command(aliases=['llist'])
+async def locallist(ctx):
+    '''
+    Lists the songs in the local library
+    Usage: $locallist
+    '''
+
+    songs = [x for x in os.listdir("/Music") if x.endswith('.flac') or x.endswith('mp3')]
+
+    for idx, s in enumerate(songs):
+        songs[idx] = str(idx) + ': ' + s
+    
+    await ctx.send(songs)
+
+@bot.command(aliases=['ladd'])
+async def localadd(ctx, url: str):
+    '''
+    Adds a song from YouTube into the local song library
+    Usage: $localadd url
+    url: YouTube URL
+    '''
+
+    ydl_opts = {
+        'format': 'bestaudio/best',
+        'outtmpl': '/Music/%(title)s.%(ext)s',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '320',
+        }],
+    }
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        print("Downloading audio now\n")
+        ydl.download([url])
+    
+    await ctx.send("Downloaded link")
 
 @bot.command()
 async def checkme(ctx):
@@ -134,7 +256,7 @@ async def pic(ctx):
     img = discord.File(f)
     await ctx.send(file=img)
 
-@bot.command()
+@bot.command(aliases=['mc'])
 async def mcss(ctx):
     '''
     Gets the status of a Minecraft server
