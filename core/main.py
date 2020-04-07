@@ -2,18 +2,20 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import constants
-import os
-import asyncio
-import sys
 import youtube_dl
 import ffmpeg
 
 import time
 import random
+import os
+import asyncio
+import sys
+import threading
 
 from mcstatus import MinecraftServer
 
 bot = commands.Bot(command_prefix = "$", description=constants.description)
+lock = threading.Event()
 
 @bot.event
 async def on_ready():
@@ -82,30 +84,61 @@ async def playyt(ctx, url: str):
 
     voice.play(discord.FFmpegPCMAudio("song.mp3"))
     voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.07
+    voice.source.volume = 0.5
 
     nname = name.rsplit("-", 2)
     await ctx.send(f"Playing: {nname[0]}")
     print("playing\n")
 
+def unlock(err):
+    lock.set()
+
 @bot.command(pass_context=True, aliases=['lplay'])
-async def localplay(ctx, num: int):
+async def localplay(ctx):
     '''
     Plays a song from the local library
-    Usage: $localplay num
+    Usage: $localplay num [num...]
     num: int index of local song
     '''
+    num = -1
+    nums = []
+    args = ctx.message.content.split(" ")
+    if len(args) < 2:
+        await ctx.send("Please specify track(s) to play")
+        return
+    elif len(args) == 2:
+        num = int(args[1])
+    else:
+        for i in range(1, len(args)):
+            nums.append(int(args[i]))
+
     await join(ctx)
     voice = get(bot.voice_clients, guild=ctx.guild)
     
     songs = [x for x in os.listdir("/Music") if x.endswith('.flac') or x.endswith('mp3')]
+    
+    if len(nums) > 0:
+        lock.set()
+        for x in nums:
+            lock.wait()
+            songname = songs[x]
+            songname = "/Music/" + songname 
+
+            voice.play(discord.FFmpegPCMAudio(songname), after=unlock)
+            voice.source = discord.PCMVolumeTransformer(voice.source)
+            voice.source.volume = 0.5
+
+            await ctx.send(f"Playing: {songname}")
+            print("playing\n")
+            lock.clear()
+        return
+    
     songname = songs[num]
     songname = "/Music/" + songname 
 
-
     voice.play(discord.FFmpegPCMAudio(songname))
     voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.07
+    voice.source.volume = 0.5
 
     await ctx.send(f"Playing: {songname}")
     print("playing\n")
@@ -118,11 +151,15 @@ async def locallist(ctx):
     '''
 
     songs = [x for x in os.listdir("/Music") if x.endswith('.flac') or x.endswith('mp3')]
+    ots = "```\n"
 
     for idx, s in enumerate(songs):
         songs[idx] = str(idx) + ': ' + s
+        ots = ots + songs[idx] + '\n'
+
+    ots = ots + "```"
     
-    await ctx.send(songs)
+    await ctx.send(ots)
 
 @bot.command(aliases=['ladd'])
 async def localadd(ctx, url: str):
@@ -294,33 +331,6 @@ async def mcss(ctx):
 
     except:
         await ctx.send("Error: could not contact MC server")
-
-@bot.command()
-async def selfie(ctx):
-    '''
-    Posts a selfie of the bot.
-    '''
-    
-    path = "/selfies/"
-    
-    pic = random.choice([
-        x for x in os.listdir(path)
-        if os.path.isfile(os.path.join(path, x))
-    ])
-    ext = os.path.splitext(pic)[1]
-    while True:
-        pic = random.choice([
-            x for x in os.listdir(path)
-            if os.path.isfile(os.path.join(path, x))
-        ])
-        ext = os.path.splitext(pic)[1]
-        if (ext == '.png') or (ext == '.jpg') or (ext == '.gif') or (ext == '.webm'):
-            break
-    
-    f = path + pic
-    img = discord.File(f)
-    await ctx.send(file=img)
-    
 
 token = os.environ.get("BOT_TOKEN")
 bot.run(token)
