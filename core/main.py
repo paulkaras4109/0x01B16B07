@@ -303,7 +303,7 @@ async def mcss(ctx):
     '''
     args = ctx.message.content.split(" ")
 
-    ip = "b1gb055.xyz"
+    ip = "192.168.1.172"
 
     if len(args) == 2:
         ip = args[1]
