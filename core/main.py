@@ -12,9 +12,11 @@ import asyncio
 import sys
 import threading
 
-from mcstatus import MinecraftServer
+from mcstatus import JavaServer
 
-bot = commands.Bot(command_prefix = "$", description=constants.description)
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix = "$", description=constants.description, intents=intents)
 lock = threading.Event()
 
 @bot.event
@@ -296,7 +298,7 @@ async def pic(ctx):
 @bot.command(aliases=['mc'])
 async def mcss(ctx):
     '''
-    Gets the status of a Minecraft server
+    Gets the status of a Java Minecraft server
     Usage: $mcss 'ip'
     ip: an IPv4 address, including port (if not default 25565).
     If none is specified, defaults to "b1gb055.xyz" (7h3 b1g 53rv3r)
@@ -309,11 +311,11 @@ async def mcss(ctx):
         ip = args[1]
     
     try:
-        mcserver = MinecraftServer.lookup(ip)
+        mcserver = JavaServer.lookup(ip)
 
         status = mcserver.status()
 
-        desc = status.description['text']
+        desc = status.description
 
         vers = status.version.name
         serverinfo = "v" + vers
