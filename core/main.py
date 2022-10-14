@@ -18,6 +18,30 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix = "$", description=constants.description, intents=intents)
 lock = threading.Event()
+ytdl = yt_dlp.YoutubeDL(constants.ytdl_format_options)
+
+
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
+
+        self.data = data
+
+        self.title = data.get('title')
+        self.url = data.get('url')
+
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(discord.FFmpegPCMAudio(filename, **constants.ffmpeg_options), data=data)
+
 
 @bot.event
 async def on_ready():
@@ -204,21 +228,13 @@ async def ytplay(ctx, url: str):
     Usage: $ytplay 'url'
     url: the URL to a YouTube video
     '''
-    ytdl = yt_dlp.YoutubeDL(constants.ytdl_format_options)
-    loop = loop or asyncio.get_event_loop()
-    data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-    if 'entries' in data:
-        data = data['entries'][0]
-    filename = data['title'] if stream else ytdl.prepare_filename(data)
-
     await join(ctx)
-    voice = get(bot.voice_clients, guild=ctx.guild)
-    voice.play(discord.FFmpegPCMAudio(filename))
-    voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.5
 
-    nname = filename.rsplit('-', 2)
-    await ctx.send(f"Playing: {nname[0]}")
+    async with ctx.typing():
+        player = await YTDLSource.from_url(url, loop=bot.loop, stream=True)
+        ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
+
+    await ctx.send(f"Playing: {player.title}")
     print("playing\n")
 
 
