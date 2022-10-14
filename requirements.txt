@@ -1,6 +1,6 @@
 discord.py[voice]
 asyncio
 mcstatus
-youtube_dl
+yt-dlp
 ffmpeg
 pynacl

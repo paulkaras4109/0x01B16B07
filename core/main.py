@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import constants
-import youtube_dl
+import yt_dlp
 import ffmpeg
 
 import time
@@ -43,155 +43,16 @@ async def leave(ctx):
     if voice and voice.is_connected():
         await voice.disconnect()
 
-@bot.command(pass_context=True, aliases=['yt'])
-async def playyt(ctx, url: str):
-    '''
-    Plays a YouTube video in your current channel
-    Usage: $playyt url
-    url: the URL to a YouTube Video
-    '''
-    os.chdir('/Music/.tmp')
-    song_there = os.path.isfile("song.mp3")
-    try:
-        if song_there:
-            os.remove("song.mp3")
-            print("Removed old song file")
-    except PermissionError:
-        print("Trying to delete song file, but it's being played")
-        await ctx.send("ERROR: Music playing")
-        return
-
-    await join(ctx)
-    voice = get(bot.voice_clients, guild=ctx.guild)
-
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': '/Music/.tmp/%(title)s.%(ext)s',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-    }
-
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        print("Downloading audio now\n")
-        ydl.download([url])
-
-    for file in os.listdir("/Music/.tmp"):
-        if file.endswith(".mp3"):
-            name = file
-            print(f"Renamed File: {file}\n")
-            os.rename(file, "song.mp3")
-
-    voice.play(discord.FFmpegPCMAudio("song.mp3"))
-    voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.5
-
-    nname = name.rsplit("-", 2)
-    await ctx.send(f"Playing: {nname[0]}")
-    print("playing\n")
 
 def unlock(err):
     lock.set()
 
-@bot.command(pass_context=True, aliases=['lplay'])
-async def localplay(ctx):
-    '''
-    Plays a song from the local library
-    Usage: $localplay num [num...]
-    num: int index of local song
-    '''
-    num = -1
-    nums = []
-    args = ctx.message.content.split(" ")
-    if len(args) < 2:
-        await ctx.send("Please specify track(s) to play")
-        return
-    elif len(args) == 2:
-        num = int(args[1])
-    else:
-        for i in range(1, len(args)):
-            nums.append(int(args[i]))
-
-    await join(ctx)
-    voice = get(bot.voice_clients, guild=ctx.guild)
-    
-    songs = [x for x in os.listdir("/Music") if x.endswith('.flac') or x.endswith('mp3')]
-    
-    if len(nums) > 0:
-        lock.set()
-        for x in nums:
-            lock.wait()
-            songname = songs[x]
-            songname = "/Music/" + songname 
-
-            voice.play(discord.FFmpegPCMAudio(songname), after=unlock)
-            voice.source = discord.PCMVolumeTransformer(voice.source)
-            voice.source.volume = 0.5
-
-            await ctx.send(f"Playing: {songname}")
-            print("playing\n")
-            lock.clear()
-        return
-    
-    songname = songs[num]
-    songname = "/Music/" + songname 
-
-    voice.play(discord.FFmpegPCMAudio(songname))
-    voice.source = discord.PCMVolumeTransformer(voice.source)
-    voice.source.volume = 0.5
-
-    await ctx.send(f"Playing: {songname}")
-    print("playing\n")
-
-@bot.command(aliases=['llist'])
-async def locallist(ctx):
-    '''
-    Lists the songs in the local library
-    Usage: $locallist
-    '''
-
-    songs = [x for x in os.listdir("/Music") if x.endswith('.flac') or x.endswith('mp3')]
-    ots = "```\n"
-
-    for idx, s in enumerate(songs):
-        songs[idx] = str(idx) + ': ' + s
-        ots = ots + songs[idx] + '\n'
-
-    ots = ots + "```"
-    
-    await ctx.send(ots)
-
-@bot.command(aliases=['ladd'])
-async def localadd(ctx, url: str):
-    '''
-    Adds a song from YouTube into the local song library
-    Usage: $localadd url
-    url: YouTube URL
-    '''
-
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': '/Music/%(title)s.%(ext)s',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '320',
-        }],
-    }
-
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        print("Downloading audio now\n")
-        ydl.download([url])
-    
-    await ctx.send("Downloaded link")
 
 @bot.command()
 async def checkme(ctx):
     '''
     Checks your message
-    Usage: $checkme3
+    Usage: $checkme
     '''
     checked = bot.get_emoji(408868557078921216)
 
@@ -206,7 +67,9 @@ async def joined(ctx, member : discord.Member):
     
 @bot.command()
 async def roll(ctx, dice: str):
-    """Rolls a dice in NdN format."""
+    '''
+    Rolls a dice in NdN format.
+    '''
     
     args = ctx.message.content.split(" ")
     if (len(args) < 2):
@@ -223,7 +86,6 @@ async def roll(ctx, dice: str):
 
 @bot.command()
 async def pasta(ctx):
-
     '''
     Prints a specified or random copypasta.
     Usage: $pasta 'key'
@@ -333,6 +195,32 @@ async def mcss(ctx):
 
     except:
         await ctx.send("Error: could not contact MC server")
+
+
+@bot.command()
+async def ytplay(ctx, url: str):
+    '''
+    Play audio from a youtube video link, and stream it to your current channel.
+    Usage: $ytplay 'url'
+    url: the URL to a YouTube video
+    '''
+    ytdl = yt_dlp.YoutubeDL(constants.ytdl_format_options)
+    loop = loop or asyncio.get_event_loop()
+    data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+    if 'entries' in data:
+        data = data['entries'][0]
+    filename = data['title'] if stream else ytdl.prepare_filename(data)
+
+    await join(ctx)
+    voice = get(bot.voice_clients, guild=ctx.guild)
+    voice.play(discord.FFmpegPCMAudio(filename))
+    voice.source = discord.PCMVolumeTransformer(voice.source)
+    voice.source.volume = 0.5
+
+    nname = filename.rsplit('-', 2)
+    await ctx.send(f"Playing: {nname[0]}")
+    print("playing\n")
+
 
 token = os.environ.get("BOT_TOKEN")
 bot.run(token)

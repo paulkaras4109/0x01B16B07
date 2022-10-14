@@ -49,3 +49,17 @@ The dark side of the Force is a pathway to many abilities some consider to be un
 Ironic. He could save others from death, but not himself.
     '''
 }
+
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0'
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
